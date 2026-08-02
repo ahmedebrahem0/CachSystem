@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
@@ -33,12 +33,17 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "--normal-bg": "var(--popover)",
           "--normal-text": "var(--popover-foreground)",
           "--normal-border": "var(--border)",
+          "--success-bg": "var(--primary)",
+          "--success-text": "var(--primary-foreground)",
+          "--success-border": "var(--primary)",
           "--border-radius": "var(--radius)",
         } as React.CSSProperties
       }
       toastOptions={{
         classNames: {
           toast: "cn-toast",
+          success: "border-primary bg-primary text-primary-foreground",
+          closeButton: "border-primary/30 bg-primary text-primary-foreground hover:bg-primary/90",
         },
       }}
       {...props}
@@ -47,3 +52,4 @@ const Toaster = ({ ...props }: ToasterProps) => {
 }
 
 export { Toaster }
+

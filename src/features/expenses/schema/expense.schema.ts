@@ -19,9 +19,24 @@ const optionalText = z
   .transform((value) => (value.length ? value : undefined))
   .optional()
 
+const normalizeAmountInput = (value: unknown) => {
+  if (value === "" || value === null || typeof value === "undefined") return undefined
+  if (typeof value === "string") return Number(value)
+  return value
+}
+
+const optionalPositiveAmount = z.preprocess(
+  normalizeAmountInput,
+  z
+    .number({ error: "أدخل القيمة" })
+    .finite("أدخل قيمة صحيحة")
+    .positive("القيمة يجب أن تكون أكبر من صفر")
+    .optional(),
+)
+
 const foodItemInputSchema = z.object({
   name: z.string().transform((value) => value.trim()).optional(),
-  amount: z.union([z.coerce.number().finite(), z.nan()]).optional(),
+  amount: optionalPositiveAmount,
 })
 
 export const expenseSchema = z
@@ -31,31 +46,14 @@ export const expenseSchema = z
     roadFeeCustomName: optionalText,
     foodItems: z.array(foodItemInputSchema).optional(),
     date: z.string().min(1, "اختر تاريخ المصروف"),
-    amount: z.coerce
-      .number({ error: "أدخل قيمة المصروف" })
-      .finite("أدخل قيمة مصروف صحيحة")
-      .optional(),
+    amount: optionalPositiveAmount,
     notes: optionalText,
-  })
-  .transform((value) => {
-    const foodItems = value.category === "food"
-      ? (value.foodItems ?? [])
-          .filter((item) => item.name || (typeof item.amount === "number" && Number.isFinite(item.amount)))
-          .map((item) => ({ name: item.name ?? "", amount: Number(item.amount) }))
-      : undefined
-    const foodTotal = foodItems?.reduce((sum, item) => sum + item.amount, 0) ?? 0
-
-    return {
-      ...value,
-      amount: value.category === "food" ? foodTotal : value.amount ?? 0,
-      roadFeeType: value.category === "road_fees" ? value.roadFeeType : undefined,
-      roadFeeCustomName: value.category === "road_fees" && value.roadFeeType === "custom" ? value.roadFeeCustomName : undefined,
-      foodItems,
-    }
   })
   .superRefine((value, ctx) => {
     if (value.category === "food") {
-      if (!value.foodItems || value.foodItems.length === 0) {
+      const foodItems = (value.foodItems ?? []).filter((item) => item.name || typeof item.amount !== "undefined")
+
+      if (foodItems.length === 0) {
         ctx.addIssue({ code: "custom", path: ["foodItems"], message: "ضيف مصروف أكل واحد على الأقل" })
       }
 
@@ -63,17 +61,17 @@ export const expenseSchema = z
         if (!item.name) {
           ctx.addIssue({ code: "custom", path: ["foodItems", index, "name"], message: "اكتب اسم المصروف" })
         }
-        if (!Number.isFinite(item.amount) || item.amount <= 0) {
-          ctx.addIssue({ code: "custom", path: ["foodItems", index, "amount"], message: "قيمة الصنف يجب أن تكون أكبر من صفر" })
+        if (typeof item.amount === "undefined") {
+          ctx.addIssue({ code: "custom", path: ["foodItems", index, "amount"], message: "أدخل قيمة الصنف" })
         }
       })
     }
 
-    if (value.category !== "food" && (!Number.isFinite(value.amount) || (value.amount ?? 0) <= 0)) {
+    if (value.category !== "food" && typeof value.amount === "undefined") {
       ctx.addIssue({
         code: "custom",
         path: ["amount"],
-        message: value.amount === undefined ? "أدخل قيمة المصروف" : "قيمة المصروف يجب أن تكون أكبر من صفر",
+        message: value.category === "road_fees" ? "أدخل قيمة الكارتة" : "أدخل قيمة المصروف",
       })
     }
 
@@ -89,6 +87,23 @@ export const expenseSchema = z
       ctx.addIssue({ code: "custom", path: ["notes"], message: "اكتب صرفت الفلوس دي في اي يا عمار" })
     }
   })
+  .transform((value) => {
+    const foodItems = value.category === "food"
+      ? (value.foodItems ?? [])
+          .filter((item) => item.name || typeof item.amount !== "undefined")
+          .map((item) => ({ name: item.name ?? "", amount: item.amount ?? 0 }))
+      : undefined
+    const foodTotal = foodItems?.reduce((sum, item) => sum + item.amount, 0) ?? 0
+
+    return {
+      ...value,
+      amount: value.category === "food" ? foodTotal : value.amount ?? 0,
+      roadFeeType: value.category === "road_fees" ? value.roadFeeType : undefined,
+      roadFeeCustomName: value.category === "road_fees" && value.roadFeeType === "custom" ? value.roadFeeCustomName : undefined,
+      foodItems,
+    }
+  })
 
 export type ExpenseFormInput = z.input<typeof expenseSchema>
 export type ExpenseFormValues = z.output<typeof expenseSchema>
+

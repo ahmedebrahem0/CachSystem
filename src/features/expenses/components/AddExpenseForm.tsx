@@ -33,6 +33,17 @@ const notePlaceholders: Record<ExpenseCategory, string> = {
   other: "اكتب صرفت الفلوس دي في اي يا عمار",
 }
 
+const expenseToastLabels: Record<ExpenseCategory, string> = {
+  fuel: "سعر الجاز",
+  repair: "مصروف التصليح",
+  food: "مصاريف الأكل",
+  road_fees: "قيمة الكارتة",
+  scale: "مصروف الميزان",
+  loading_unloading: "مصروف التحميل والتفريغ",
+  permits: "مصروف التصريح",
+  other: "المصروف الآخر",
+}
+
 export function AddExpenseForm({
   tripId,
   tripDate,
@@ -87,10 +98,10 @@ export function AddExpenseForm({
     try {
       if (expense) {
         await updateExpense(expense.id, values)
-        toast.success("تم تعديل المصروف")
+        toast.success(`تم تعديل ${expenseToastLabels[values.category]}`)
       } else {
         await createExpense({ ...values, tripId })
-        toast.success("تم حفظ المصروف")
+        toast.success(`تم حفظ ${expenseToastLabels[values.category]}`)
       }
       onSaved()
     } catch (error) {
@@ -238,6 +249,8 @@ export function AddExpenseForm({
     </form>
   )
 }
+
+
 
 
 
