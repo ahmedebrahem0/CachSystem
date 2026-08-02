@@ -19,12 +19,9 @@ const optionalText = z
   .transform((value) => (value.length ? value : undefined))
   .optional()
 
-const foodItemSchema = z.object({
-  name: z.string().trim().min(1, "اكتب اسم المصروف"),
-  amount: z.coerce
-    .number({ error: "اكتب قيمة الصنف" })
-    .finite("اكتب قيمة صحيحة")
-    .positive("قيمة الصنف يجب أن تكون أكبر من صفر"),
+const foodItemInputSchema = z.object({
+  name: z.string().transform((value) => value.trim()).optional(),
+  amount: z.union([z.coerce.number().finite(), z.nan()]).optional(),
 })
 
 export const expenseSchema = z
@@ -32,7 +29,7 @@ export const expenseSchema = z
     category: z.enum(categories, { error: "اختر نوع المصروف" }),
     roadFeeType: z.enum(["middle", "regional", "dahshur", "desert", "custom"], { error: "اختار نوع الكارتة" }).optional(),
     roadFeeCustomName: optionalText,
-    foodItems: z.array(foodItemSchema).optional(),
+    foodItems: z.array(foodItemInputSchema).optional(),
     date: z.string().min(1, "اختر تاريخ المصروف"),
     amount: z.coerce
       .number({ error: "أدخل قيمة المصروف" })
@@ -41,7 +38,11 @@ export const expenseSchema = z
     notes: optionalText,
   })
   .transform((value) => {
-    const foodItems = value.category === "food" ? value.foodItems : undefined
+    const foodItems = value.category === "food"
+      ? (value.foodItems ?? [])
+          .filter((item) => item.name || (typeof item.amount === "number" && Number.isFinite(item.amount)))
+          .map((item) => ({ name: item.name ?? "", amount: Number(item.amount) }))
+      : undefined
     const foodTotal = foodItems?.reduce((sum, item) => sum + item.amount, 0) ?? 0
 
     return {
@@ -53,11 +54,18 @@ export const expenseSchema = z
     }
   })
   .superRefine((value, ctx) => {
-    if (value.category === "food" && (!value.foodItems || value.foodItems.length === 0)) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["foodItems"],
-        message: "ضيف مصروف أكل واحد على الأقل",
+    if (value.category === "food") {
+      if (!value.foodItems || value.foodItems.length === 0) {
+        ctx.addIssue({ code: "custom", path: ["foodItems"], message: "ضيف مصروف أكل واحد على الأقل" })
+      }
+
+      value.foodItems?.forEach((item, index) => {
+        if (!item.name) {
+          ctx.addIssue({ code: "custom", path: ["foodItems", index, "name"], message: "اكتب اسم المصروف" })
+        }
+        if (!Number.isFinite(item.amount) || item.amount <= 0) {
+          ctx.addIssue({ code: "custom", path: ["foodItems", index, "amount"], message: "قيمة الصنف يجب أن تكون أكبر من صفر" })
+        }
       })
     }
 
@@ -70,27 +78,15 @@ export const expenseSchema = z
     }
 
     if (value.category === "road_fees" && !value.roadFeeType) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["roadFeeType"],
-        message: "اختار نوع الكارتة",
-      })
+      ctx.addIssue({ code: "custom", path: ["roadFeeType"], message: "اختار نوع الكارتة" })
     }
 
     if (value.category === "road_fees" && value.roadFeeType === "custom" && !value.roadFeeCustomName) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["roadFeeCustomName"],
-        message: "اكتب اسم الكارتة يا عمار",
-      })
+      ctx.addIssue({ code: "custom", path: ["roadFeeCustomName"], message: "اكتب اسم الكارتة يا عمار" })
     }
 
     if (value.category === "other" && !value.notes) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["notes"],
-        message: "اكتب صرفت الفلوس دي في اي يا عمار",
-      })
+      ctx.addIssue({ code: "custom", path: ["notes"], message: "اكتب صرفت الفلوس دي في اي يا عمار" })
     }
   })
 

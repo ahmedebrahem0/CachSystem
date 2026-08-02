@@ -47,8 +47,7 @@ export function AppSelect({
 
       {open ? (
         <>
-          <button type="button" aria-label="إغلاق القائمة" className="fixed inset-0 z-40 cursor-default bg-transparent" onClick={() => setOpen(false)} />
-          <div className="absolute inset-x-0 top-[calc(100%+0.5rem)] z-50 overflow-hidden rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-xl">
+          <div className="absolute inset-x-0 top-[calc(100%+0.5rem)] z-[70] overflow-hidden rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-xl">
             <div role="listbox" className="max-h-72 overflow-auto">
               {options.map((option) => {
                 const active = option.value === value
@@ -84,3 +83,4 @@ export function AppSelect({
     </div>
   )
 }
+
