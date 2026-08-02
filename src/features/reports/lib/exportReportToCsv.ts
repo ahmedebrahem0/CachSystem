@@ -1,10 +1,15 @@
-import { expenseCategoryMap } from "@/constants/expense-categories"
+﻿import { expenseCategoryMap } from "@/constants/expense-categories"
+import { getRoadFeeLabel } from "@/constants/road-fee-types"
 import type { MonthlyReportData } from "@/features/reports/lib/buildMonthlyReport"
 import { formatArabicDate } from "@/lib/utils/formatDate"
 
 function escapeCsv(value: string | number | undefined) {
   const text = String(value ?? "")
   return `"${text.replaceAll('"', '""')}"`
+}
+
+function formatFoodItems(expense: { foodItems?: { name: string; amount: number }[] }) {
+  return expense.foodItems?.map((item) => `${item.name}: ${item.amount}`).join(" | ")
 }
 
 export function exportReportToCsv(report: MonthlyReportData) {
@@ -19,6 +24,8 @@ export function exportReportToCsv(report: MonthlyReportData) {
     "المتبقي",
     "العجز",
     "نوع المصروف",
+    "نوع الكارتة",
+    "تفاصيل الأكل",
     "قيمة المصروف",
     "تاريخ المصروف",
     "ملاحظة المصروف",
@@ -26,21 +33,7 @@ export function exportReportToCsv(report: MonthlyReportData) {
 
   const rows = report.trips.flatMap((item) => {
     if (!item.expenses.length) {
-      return [[
-        report.month,
-        item.trip.tripNumber,
-        formatArabicDate(item.trip.date),
-        item.trip.route,
-        item.trip.status === "open" ? "مفتوحة" : "مقفولة",
-        item.trip.advanceAmount,
-        item.balance.totalExpenses,
-        item.balance.remainingAmount,
-        item.balance.deficitAmount,
-        "",
-        "",
-        "",
-        "",
-      ]]
+      return [[report.month, item.trip.tripNumber, formatArabicDate(item.trip.date), item.trip.route, item.trip.status === "open" ? "مفتوحة" : "مقفولة", item.trip.advanceAmount, item.balance.totalExpenses, item.balance.remainingAmount, item.balance.deficitAmount, "", "", "", "", "", ""]]
     }
     return item.expenses.map((expense) => [
       report.month,
@@ -53,6 +46,8 @@ export function exportReportToCsv(report: MonthlyReportData) {
       item.balance.remainingAmount,
       item.balance.deficitAmount,
       expenseCategoryMap[expense.category].label,
+      getRoadFeeLabel(expense.roadFeeType, expense.roadFeeCustomName) ?? "",
+      formatFoodItems(expense) ?? "",
       expense.amount,
       formatArabicDate(expense.date),
       expense.notes,

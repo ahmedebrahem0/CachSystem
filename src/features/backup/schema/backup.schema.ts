@@ -1,4 +1,4 @@
-import { z } from "zod"
+﻿import { z } from "zod"
 
 import { BACKUP_VERSION } from "@/constants/storage"
 
@@ -15,10 +15,18 @@ const tripSchema = z.object({
   closedAt: z.string().optional(),
 })
 
+const foodItemSchema = z.object({
+  name: z.string().min(1),
+  amount: z.number().finite().positive(),
+})
+
 const expenseSchema = z.object({
   id: z.string().min(1),
   tripId: z.string().min(1),
   category: z.enum(["fuel", "repair", "food", "road_fees", "scale", "loading_unloading", "permits", "other"]),
+  roadFeeType: z.enum(["middle", "regional", "dahshur", "desert", "custom"]).optional(),
+  roadFeeCustomName: z.string().optional(),
+  foodItems: z.array(foodItemSchema).optional(),
   amount: z.number().finite().positive(),
   date: z.string().min(1),
   notes: z.string().optional(),

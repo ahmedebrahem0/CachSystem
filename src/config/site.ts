@@ -1,5 +1,5 @@
 export const siteConfig = {
-  name: "حساب عهد النقل",
+  name: "مصروفات",
   description: "تطبيق بسيط لتسجيل عهد النقل والمصروفات وحساب المتبقي",
   currency: "EGP",
   currencyLabel: "ج.م",
