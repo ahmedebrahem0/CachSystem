@@ -4,9 +4,7 @@ import { Eye, EyeOff, LockKeyhole, Phone, Truck } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-
 import { isAuthenticated, login } from "@/features/auth/lib/auth"
-
 export function LoginPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -36,8 +34,9 @@ export function LoginPageContent() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-background p-4">
-      <section className="app-card w-full max-w-sm overflow-hidden">
+    <main className="relative grid min-h-screen place-items-center overflow-hidden bg-cover bg-center p-4" style={{ backgroundImage: 'url("/log-cover.png")' }}>
+      <div className="absolute inset-0 " aria-hidden="true" />
+      <section className="app-card relative z-10 w-full max-w-sm overflow-hidden bg-card/95 shadow-2xl shadow-black/25">
         <div className="bg-primary p-5 text-primary-foreground">
           <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-white/15">
             <Truck className="size-8" />
@@ -93,6 +92,7 @@ export function LoginPageContent() {
     </main>
   )
 }
+
 
 
 
