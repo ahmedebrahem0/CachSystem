@@ -1,11 +1,11 @@
-import type { MetadataRoute } from "next"
+﻿import type { MetadataRoute } from "next"
 
 import { siteConfig } from "@/config/site"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: siteConfig.name,
-    short_name: "عهد النقل",
+    short_name: siteConfig.name,
     description: siteConfig.description,
     lang: "ar",
     dir: "rtl",
@@ -19,3 +19,4 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
   }
 }
+

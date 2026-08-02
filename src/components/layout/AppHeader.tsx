@@ -1,17 +1,12 @@
 ﻿"use client"
 
-import { ArrowRight, LogOut } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-import { logout } from "@/features/auth/lib/auth"
+import { siteConfig } from "@/config/site"
 
 export function AppHeader({ title, showBack }: { title: string; showBack?: boolean }) {
   const router = useRouter()
-
-  function handleLogout() {
-    logout()
-    router.replace("/login")
-  }
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/95 px-4 py-3 backdrop-blur no-print">
@@ -27,17 +22,9 @@ export function AppHeader({ title, showBack }: { title: string; showBack?: boole
           </button>
         ) : null}
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-muted-foreground">حساب عهد النقل</p>
+          <p className="text-xs text-muted-foreground">{siteConfig.name}</p>
           <h1 className="truncate text-lg font-bold">{title}</h1>
         </div>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="flex size-11 items-center justify-center rounded-full border border-border bg-card text-destructive"
-          aria-label="تسجيل الخروج"
-        >
-          <LogOut className="size-5" />
-        </button>
       </div>
     </header>
   )

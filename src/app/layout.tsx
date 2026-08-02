@@ -1,14 +1,8 @@
-import type { Metadata, Viewport } from "next"
-import { Cairo } from "next/font/google"
+﻿import type { Metadata, Viewport } from "next"
 
 import { AppProviders } from "@/components/providers/AppProviders"
 import { siteConfig } from "@/config/site"
 import "./globals.css"
-
-const cairo = Cairo({
-  subsets: ["arabic", "latin"],
-  display: "swap",
-})
 
 export const metadata: Metadata = {
   applicationName: siteConfig.name,
@@ -32,7 +26,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ar" dir="rtl">
-      <body className={cairo.className}>
+      <body>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>
