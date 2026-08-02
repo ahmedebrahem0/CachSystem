@@ -45,7 +45,7 @@ export function ExpenseCard({ expense, onEdit }: { expense: Expense; onEdit: (ex
             <button aria-label="تعديل المصروف" onClick={() => onEdit(expense)} className="flex size-9 items-center justify-center rounded-lg border border-border">
               <Pencil className="size-4" />
             </button>
-            <ConfirmDialog title="حذف المصروف" description="هل تريد حذف هذا المصروف؟ لا يمكن التراجع عن هذا الإجراء." confirmLabel="حذف" destructive onConfirm={() => deleteExpense(expense.id)}>
+            <ConfirmDialog title="حذف المصروف" description="هل تريد حذف هذا المصروف؟ لا يمكن التراجع عن هذا الإجراء." confirmLabel="تأكيد الحذف" destructive onConfirm={() => deleteExpense(expense.id)}>
               {(open) => (
                 <button aria-label="حذف المصروف" onClick={open} className="flex size-9 items-center justify-center rounded-lg border border-red-200 text-destructive">
                   <Trash2 className="size-4" />
@@ -58,3 +58,4 @@ export function ExpenseCard({ expense, onEdit }: { expense: Expense; onEdit: (ex
     </div>
   )
 }
+

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -73,7 +73,7 @@ export function TripDetails({ tripId }: { tripId: string }) {
             <LockOpen className="size-4" /> إعادة فتح
           </button>
         )}
-        <ConfirmDialog title="هل أنت متأكد من حذف هذه النقلة؟" description="سيتم حذف النقلة وجميع المصروفات المرتبطة بها، ولا يمكن التراجع عن هذا الإجراء." confirmLabel="حذف النقلة" destructive onConfirm={handleDelete}>
+        <ConfirmDialog title="هل أنت متأكد من حذف هذه النقلة؟" description="سيتم حذف النقلة وجميع المصروفات المرتبطة بها، ولا يمكن التراجع عن هذا الإجراء." confirmLabel="تأكيد حذف النقلة" destructive onConfirm={handleDelete}>
           {(open) => (
             <button onClick={open} className="col-span-2 flex items-center justify-center gap-2 rounded-xl border border-red-200 px-4 py-3 font-bold text-destructive">
               <Trash2 className="size-4" /> حذف النقلة
@@ -101,3 +101,4 @@ export function TripDetails({ tripId }: { tripId: string }) {
     </div>
   )
 }
+

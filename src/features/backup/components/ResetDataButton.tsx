@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { Trash2 } from "lucide-react"
 import { toast } from "sonner"
@@ -8,7 +8,7 @@ import { resetApplicationData } from "@/features/backup/lib/importBackup"
 
 export function ResetDataButton() {
   return (
-    <ConfirmDialog title="حذف جميع البيانات" description="سيتم حذف كل النقلات والمصروفات من هذا الجهاز نهائيًا." confirmLabel="حذف جميع البيانات" destructive onConfirm={async () => {
+    <ConfirmDialog title="حذف جميع البيانات" description="سيتم حذف كل النقلات والمصروفات من هذا الجهاز نهائيًا." confirmLabel="تأكيد حذف البيانات" destructive onConfirm={async () => {
       await resetApplicationData()
       toast.success("تم حذف جميع البيانات")
     }}>
@@ -20,3 +20,4 @@ export function ResetDataButton() {
     </ConfirmDialog>
   )
 }
+

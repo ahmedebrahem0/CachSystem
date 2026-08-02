@@ -7,6 +7,7 @@ import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form"
 import { toast } from "sonner"
 
 import { AppSelect } from "@/components/common/AppSelect"
+import { ConfirmDialog } from "@/components/common/ConfirmDialog"
 import { CurrencyInput } from "@/components/common/CurrencyInput"
 import { DatePicker } from "@/components/common/DatePicker"
 import { expenseCategories } from "@/constants/expense-categories"
@@ -20,6 +21,17 @@ import { getErrorMessage } from "@/lib/utils/getErrorMessage"
 
 const defaultFoodItem = { name: "", amount: undefined }
 const foodPlaceholders = ["عيش مثلا", "لحمة", "فراخ", "مياه", "شاي وسكر", "خضار", "فاكهة", "مشروبات غازية", "حلويات", "وجبات سريعة "]
+
+const notePlaceholders: Record<ExpenseCategory, string> = {
+  fuel: "مثال: حطيت جاز قد إيه؟ 50 لتر أو جاز بـ 700 ج.م",
+  repair: "مثال: غيرت زيت، لحمت كاوتش، صلحت فرامل...",
+  food: "ملاحظة اختيارية عن الأكل أو المكان لو محتاج",
+  road_fees: "اكتب أي تفاصيل عن الكارتة أو مكان الدفع لو محتاج",
+  scale: "مثال: ميزان فين أو رقم الإيصال لو موجود",
+  loading_unloading: "مثال: تحميل، تفريغ، عمال، ونش...",
+  permits: "مثال: نوع التصريح أو الجهة اللي اتدفع لها",
+  other: "اكتب صرفت الفلوس دي في اي يا عمار",
+}
 
 export function AddExpenseForm({
   tripId,
@@ -171,15 +183,25 @@ export function AddExpenseForm({
                     <span className="sr-only">قيمة مصروف الأكل</span>
                     <CurrencyInput {...register(`foodItems.${index}.amount`)} placeholder="القيمة" />
                   </label>
-                  <button
-                    type="button"
-                    aria-label="حذف صنف الأكل"
-                    onClick={() => fields.length > 1 && remove(index)}
-                    disabled={fields.length === 1}
-                    className="flex size-11 items-center justify-center rounded-xl border border-red-200 text-destructive disabled:opacity-40"
+                  <ConfirmDialog
+                    title="حذف صنف الأكل"
+                    description="هل تريد حذف هذا الصنف من تفاصيل الأكل؟"
+                    confirmLabel="تأكيد الحذف"
+                    destructive
+                    onConfirm={() => remove(index)}
                   >
-                    <Trash2 className="size-4" />
-                  </button>
+                    {(open) => (
+                      <button
+                        type="button"
+                        aria-label="حذف صنف الأكل"
+                        onClick={open}
+                        disabled={fields.length === 1}
+                        className="flex size-11 items-center justify-center rounded-xl border border-red-200 text-destructive disabled:opacity-40"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    )}
+                  </ConfirmDialog>
                 </div>
                 {errors.foodItems?.[index]?.name?.message ? <span className="mt-1 block text-sm text-destructive">{errors.foodItems[index]?.name?.message}</span> : null}
                 {errors.foodItems?.[index]?.amount?.message ? <span className="mt-1 block text-sm text-destructive">{errors.foodItems[index]?.amount?.message}</span> : null}
@@ -207,7 +229,7 @@ export function AddExpenseForm({
       </label>
       <label className="block">
         <span className="mb-1 block text-sm font-bold">ملاحظة {selectedCategory === "other" ? "مطلوبة" : ""}</span>
-        <textarea className="app-field min-h-24" {...register("notes")} />
+        <textarea className="app-field min-h-24" {...register("notes")} placeholder={notePlaceholders[selectedCategory]} />
         {errors.notes?.message ? <span className="text-sm text-destructive">{errors.notes.message}</span> : null}
       </label>
       <button disabled={isSubmitting} className="w-full rounded-xl bg-primary px-5 py-4 font-bold text-primary-foreground">
@@ -216,5 +238,7 @@ export function AddExpenseForm({
     </form>
   )
 }
+
+
 
 
