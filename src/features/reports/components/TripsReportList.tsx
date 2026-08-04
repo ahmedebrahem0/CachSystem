@@ -11,14 +11,19 @@ export function TripsReportList({ report }: { report: MonthlyReportData }) {
       {report.trips.map((item) => (
         <details key={item.trip.id} className="app-card p-4" open>
           <summary className="cursor-pointer font-black">
-            {item.trip.tripNumber} - {formatCurrency(item.balance.balance)}
+            {item.trip.tripNumber} - {formatCurrency(item.freightNetAfterAdvance)}
           </summary>
           <div className="mt-3 grid gap-2 text-sm">
             <p>التاريخ: {formatArabicDate(item.trip.date)}</p>
+            {item.trip.destination ? <p>المكان: {item.trip.destination}</p> : null}
             {item.trip.route ? <p>خط السير: {item.trip.route}</p> : null}
+            <p>عدد الأطنان: {item.trip.cargoWeightTons ?? 0}</p>
+            <p>سعر الطن: {formatCurrency(item.trip.pricePerTon)}</p>
+            <p>إجمالي سعر النقلة: {formatCurrency(item.freightAmount)}</p>
             <p>العهدة: {formatCurrency(item.trip.advanceAmount)}</p>
+            <p>صافي النقلة بعد العهدة: {formatCurrency(item.freightNetAfterAdvance)}</p>
             <p>المصروفات: {formatCurrency(item.balance.totalExpenses)}</p>
-            <p>المتبقي: {formatCurrency(item.balance.remainingAmount)}</p>
+            <p>المتبقي من العهدة: {formatCurrency(item.balance.remainingAmount)}</p>
             <p>العجز: {formatCurrency(item.balance.deficitAmount)}</p>
             <p>الحالة: {item.trip.status === "open" ? "مفتوحة" : "مقفولة"}</p>
           </div>

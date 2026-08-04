@@ -17,11 +17,16 @@ export function exportReportToCsv(report: MonthlyReportData) {
     "الشهر",
     "اسم النقلة",
     "تاريخ النقلة",
+    "المكان",
     "خط السير",
     "حالة النقلة",
+    "عدد الأطنان",
+    "سعر الطن",
+    "إجمالي سعر النقلة",
     "قيمة العهدة",
+    "صافي النقلة بعد العهدة",
     "إجمالي مصروفات النقلة",
-    "المتبقي",
+    "المتبقي من العهدة",
     "العجز",
     "نوع المصروف",
     "نوع الكارتة",
@@ -32,19 +37,29 @@ export function exportReportToCsv(report: MonthlyReportData) {
   ]
 
   const rows = report.trips.flatMap((item) => {
-    if (!item.expenses.length) {
-      return [[report.month, item.trip.tripNumber, formatArabicDate(item.trip.date), item.trip.route, item.trip.status === "open" ? "مفتوحة" : "مقفولة", item.trip.advanceAmount, item.balance.totalExpenses, item.balance.remainingAmount, item.balance.deficitAmount, "", "", "", "", "", ""]]
-    }
-    return item.expenses.map((expense) => [
+    const tripColumns = [
       report.month,
       item.trip.tripNumber,
       formatArabicDate(item.trip.date),
+      item.trip.destination,
       item.trip.route,
       item.trip.status === "open" ? "مفتوحة" : "مقفولة",
+      item.trip.cargoWeightTons,
+      item.trip.pricePerTon,
+      item.freightAmount,
       item.trip.advanceAmount,
+      item.freightNetAfterAdvance,
       item.balance.totalExpenses,
       item.balance.remainingAmount,
       item.balance.deficitAmount,
+    ]
+
+    if (!item.expenses.length) {
+      return [[...tripColumns, "", "", "", "", "", ""]]
+    }
+
+    return item.expenses.map((expense) => [
+      ...tripColumns,
       expenseCategoryMap[expense.category].label,
       getRoadFeeLabel(expense.roadFeeType, expense.roadFeeCustomName) ?? "",
       formatFoodItems(expense) ?? "",
@@ -54,7 +69,15 @@ export function exportReportToCsv(report: MonthlyReportData) {
     ])
   })
 
-  const csv = "\uFEFF" + [headers, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\r\n")
+  const totals = [
+    [],
+    ["الإجماليات"],
+    ["إجمالي العهد", report.summary.totalAdvances],
+    ["إجمالي أسعار النقل", report.summary.totalFreight],
+    ["صافي الناتج بعد طرح العهد من النقل", report.summary.netFreightAfterAdvances],
+  ]
+
+  const csv = "\uFEFF" + [headers, ...rows, ...totals].map((row) => row.map(escapeCsv).join(",")).join("\r\n")
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" })
   const url = URL.createObjectURL(blob)
   const link = document.createElement("a")

@@ -1,13 +1,16 @@
-import { expenseCategories } from "@/constants/expense-categories"
+﻿import { expenseCategories } from "@/constants/expense-categories"
 import type { Expense, ExpenseCategory } from "@/features/expenses/types"
 import { calculateDashboardSummary, type DashboardSummary } from "@/features/dashboard/lib/calculateDashboardSummary"
 import { calculateTripBalance, type TripBalance } from "@/features/trips/lib/calculateTripBalance"
+import { calculateTripFreight, calculateTripFreightNet } from "@/features/trips/lib/calculateTripFreight"
 import type { Trip } from "@/features/trips/types"
 
 export interface TripReportItem {
   trip: Trip
   expenses: Expense[]
   balance: TripBalance
+  freightAmount: number
+  freightNetAfterAdvance: number
 }
 
 export interface MonthlyReportData {
@@ -28,7 +31,13 @@ export function buildMonthlyReport(month: string, trips: Trip[], expenses: Expen
     categoryTotals,
     trips: trips.map((trip) => {
       const tripExpenses = expenses.filter((expense) => expense.tripId === trip.id)
-      return { trip, expenses: tripExpenses, balance: calculateTripBalance(trip, tripExpenses) }
+      return {
+        trip,
+        expenses: tripExpenses,
+        balance: calculateTripBalance(trip, tripExpenses),
+        freightAmount: calculateTripFreight(trip),
+        freightNetAfterAdvance: calculateTripFreightNet(trip),
+      }
     }),
   }
 }

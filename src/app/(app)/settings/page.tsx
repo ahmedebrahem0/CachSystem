@@ -1,13 +1,15 @@
-import { PageHeader } from "@/components/common/PageHeader"
+﻿import { PageHeader } from "@/components/common/PageHeader"
+import { siteConfig } from "@/config/site"
 import { BackupActions } from "@/features/backup/components/BackupActions"
 import { ImportBackupButton } from "@/features/backup/components/ImportBackupButton"
 import { ResetDataButton } from "@/features/backup/components/ResetDataButton"
-import { siteConfig } from "@/config/site"
+import { FreightRatesManager } from "@/features/freight-rates/components/FreightRatesManager"
 
 export default function SettingsPage() {
   return (
     <div className="space-y-4">
-      <PageHeader title="الإعدادات" description="إدارة النسخ الاحتياطية وبيانات الجهاز" />
+      <PageHeader title="الإعدادات" description="إدارة أسعار الأماكن والنسخ الاحتياطية وبيانات الجهاز" />
+      <FreightRatesManager />
       <section className="app-card space-y-3 p-4">
         <h2 className="text-lg font-black">النسخ الاحتياطي والاستعادة</h2>
         <BackupActions />

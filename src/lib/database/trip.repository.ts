@@ -1,9 +1,9 @@
-import type { Trip } from "@/features/trips/types"
+﻿import type { Trip } from "@/features/trips/types"
 import { generateId } from "@/lib/utils/generateId"
 import { getMonthRange } from "@/lib/utils/formatDate"
 import { db } from "./db"
 
-type CreateTripInput = Pick<Trip, "tripNumber" | "date" | "advanceAmount"> &
+type CreateTripInput = Pick<Trip, "tripNumber" | "date" | "advanceAmount" | "destination" | "cargoWeightTons" | "pricePerTon" | "freightAmount"> &
   Partial<Pick<Trip, "route" | "notes">>
 
 type UpdateTripInput = Partial<Omit<Trip, "id" | "createdAt" | "updatedAt">>
@@ -22,6 +22,10 @@ export async function createTrip(input: CreateTripInput) {
     tripNumber: input.tripNumber.trim(),
     date: input.date,
     route: input.route?.trim() || undefined,
+    destination: input.destination?.trim() || undefined,
+    cargoWeightTons: input.cargoWeightTons,
+    pricePerTon: input.pricePerTon,
+    freightAmount: input.freightAmount,
     advanceAmount: input.advanceAmount,
     status: "open",
     notes: input.notes?.trim() || undefined,
@@ -37,6 +41,7 @@ export async function updateTrip(id: string, input: UpdateTripInput) {
     ...input,
     tripNumber: input.tripNumber?.trim(),
     route: input.route?.trim() || undefined,
+    destination: input.destination?.trim() || undefined,
     notes: input.notes?.trim() || undefined,
     updatedAt: new Date().toISOString(),
   }

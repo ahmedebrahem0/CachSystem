@@ -42,7 +42,8 @@ export function TripDetails({ tripId }: { tripId: string }) {
           <div>
             <h2 className="text-2xl font-black">{trip.tripNumber}</h2>
             <p className="text-sm text-muted-foreground">{formatArabicDate(trip.date)}</p>
-            {trip.route ? <p className="mt-2 font-semibold">{trip.route}</p> : null}
+            {trip.destination ? <p className="mt-2 font-bold text-primary">{trip.destination}</p> : null}
+            {trip.route ? <p className="mt-1 font-semibold">{trip.route}</p> : null}
           </div>
           <span className={`rounded-full px-3 py-1 text-xs font-bold ${trip.status === "open" ? "bg-emerald-100 text-emerald-900" : "bg-slate-100 text-slate-700"}`}>
             {trip.status === "open" ? "مفتوحة" : "مقفولة"}
@@ -101,4 +102,5 @@ export function TripDetails({ tripId }: { tripId: string }) {
     </div>
   )
 }
+
 

@@ -1,6 +1,7 @@
-import { expenseCategories } from "@/constants/expense-categories"
+﻿import { expenseCategories } from "@/constants/expense-categories"
 import type { Expense, ExpenseCategory } from "@/features/expenses/types"
 import { calculateTripBalance } from "@/features/trips/lib/calculateTripBalance"
+import { calculateTripFreight } from "@/features/trips/lib/calculateTripFreight"
 import type { Trip } from "@/features/trips/types"
 
 export interface DashboardSummary {
@@ -8,6 +9,8 @@ export interface DashboardSummary {
   openTripCount: number
   closedTripCount: number
   totalAdvances: number
+  totalFreight: number
+  netFreightAfterAdvances: number
   totalExpenses: number
   netBalance: number
   totalRemaining: number
@@ -23,6 +26,7 @@ export function calculateDashboardSummary(trips: Trip[], expenses: Expense[]): D
   for (const expense of expenses) expensesByCategory[expense.category] += expense.amount
 
   const totalAdvances = trips.reduce((sum, trip) => sum + trip.advanceAmount, 0)
+  const totalFreight = trips.reduce((sum, trip) => sum + calculateTripFreight(trip), 0)
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
   const tripBalances = trips.map((trip) =>
     calculateTripBalance(trip, expenses.filter((expense) => expense.tripId === trip.id))
@@ -33,6 +37,8 @@ export function calculateDashboardSummary(trips: Trip[], expenses: Expense[]): D
     openTripCount: trips.filter((trip) => trip.status === "open").length,
     closedTripCount: trips.filter((trip) => trip.status === "closed").length,
     totalAdvances,
+    totalFreight,
+    netFreightAfterAdvances: totalFreight - totalAdvances,
     totalExpenses,
     netBalance: totalAdvances - totalExpenses,
     totalRemaining: tripBalances.reduce((sum, item) => sum + item.remainingAmount, 0),
