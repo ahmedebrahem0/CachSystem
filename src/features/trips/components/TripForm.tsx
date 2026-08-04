@@ -106,9 +106,6 @@ export function TripForm({ trip }: { trip?: Trip }) {
       <FormField label="قيمة العهدة" error={errors.advanceAmount?.message}>
         <CurrencyInput {...register("advanceAmount")} placeholder="0" />
       </FormField>
-      <FormField label="ملاحظات" error={errors.notes?.message}>
-        <textarea className="app-field min-h-24" {...register("notes")} />
-      </FormField>
       <div className="sticky bottom-24 z-20 rounded-xl bg-background/90 py-2 backdrop-blur no-print">
         <button disabled={isSubmitting} className="w-full rounded-xl bg-primary px-5 py-4 font-bold text-primary-foreground">
           {isSubmitting ? "جاري الحفظ..." : trip ? "حفظ التعديلات" : "حفظ النقلة"}
@@ -127,6 +124,7 @@ function FormField({ label, error, children }: { label: string; error?: string; 
     </div>
   )
 }
+
 
 
 
