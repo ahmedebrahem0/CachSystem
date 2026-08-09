@@ -33,12 +33,19 @@ const foodItemSchema = z.object({
   amount: z.number().finite().positive(),
 })
 
+const roadFeeItemSchema = z.object({
+  roadFeeType: z.enum(["middle", "regional", "dahshur", "desert", "abu_saleh", "custom"]),
+  customName: z.string().optional(),
+  amount: z.number().finite().positive(),
+})
+
 const expenseSchema = z.object({
   id: z.string().min(1),
   tripId: z.string().min(1),
-  category: z.enum(["fuel", "repair", "food", "road_fees", "scale", "loading_unloading", "permits", "other"]),
-  roadFeeType: z.enum(["middle", "regional", "dahshur", "desert", "custom"]).optional(),
+  category: z.enum(["fuel", "fuel_return", "repair", "food", "road_fees", "scale", "loading_unloading", "permits", "other"]),
+  roadFeeType: z.enum(["middle", "regional", "dahshur", "desert", "abu_saleh", "custom"]).optional(),
   roadFeeCustomName: z.string().optional(),
+  roadFeeItems: z.array(roadFeeItemSchema).optional(),
   foodItems: z.array(foodItemSchema).optional(),
   amount: z.number().finite().positive(),
   date: z.string().min(1),
@@ -47,13 +54,24 @@ const expenseSchema = z.object({
   updatedAt: z.string().min(1),
 })
 
+const tripLoanSchema = z.object({
+  id: z.string().min(1),
+  tripId: z.string().min(1),
+  personName: z.string().min(1),
+  amount: z.number().finite().positive(),
+  date: z.string().min(1),
+  notes: z.string().optional(),
+  createdAt: z.string().min(1),
+  updatedAt: z.string().min(1),
+})
 export const backupSchema = z
   .object({
-    version: z.union([z.literal(1), z.literal(BACKUP_VERSION)]),
+    version: z.union([z.literal(1), z.literal(2), z.literal(BACKUP_VERSION)]),
     exportedAt: z.string().min(1),
     trips: z.array(tripSchema),
     expenses: z.array(expenseSchema),
     freightRates: z.array(freightRateSchema).optional(),
+    tripLoans: z.array(tripLoanSchema).optional(),
   })
   .superRefine((backup, ctx) => {
     const tripIds = new Set(backup.trips.map((trip) => trip.id))
@@ -62,6 +80,15 @@ export const backupSchema = z
         ctx.addIssue({ code: "custom", path: ["expenses", index, "tripId"], message: "مصروف مرتبط بنقلة غير موجودة" })
       }
     })
+    backup.tripLoans?.forEach((loan, index) => {
+      if (!tripIds.has(loan.tripId)) {
+        ctx.addIssue({ code: "custom", path: ["tripLoans", index, "tripId"], message: "سلفة مرتبطة بنقلة غير موجودة" })
+      }
+    })
   })
 
 export type BackupData = z.infer<typeof backupSchema>
+
+
+
+

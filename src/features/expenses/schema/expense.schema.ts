@@ -4,6 +4,7 @@ import type { ExpenseCategory } from "@/features/expenses/types"
 
 const categories: ExpenseCategory[] = [
   "fuel",
+  "fuel_return",
   "repair",
   "food",
   "road_fees",
@@ -11,7 +12,10 @@ const categories: ExpenseCategory[] = [
   "loading_unloading",
   "permits",
   "other",
+  "trip_loan",
 ]
+
+const roadFeeTypeSchema = z.enum(["middle", "regional", "dahshur", "desert", "abu_saleh", "custom"], { error: "اختار نوع الكارتة" })
 
 const optionalText = z
   .string()
@@ -39,14 +43,22 @@ const foodItemInputSchema = z.object({
   amount: optionalPositiveAmount,
 })
 
+const roadFeeItemInputSchema = z.object({
+  roadFeeType: roadFeeTypeSchema.optional(),
+  customName: optionalText,
+  amount: optionalPositiveAmount,
+})
+
 export const expenseSchema = z
   .object({
     category: z.enum(categories, { error: "اختر نوع المصروف" }),
-    roadFeeType: z.enum(["middle", "regional", "dahshur", "desert", "custom"], { error: "اختار نوع الكارتة" }).optional(),
+    roadFeeType: roadFeeTypeSchema.optional(),
     roadFeeCustomName: optionalText,
+    roadFeeItems: z.array(roadFeeItemInputSchema).optional(),
     foodItems: z.array(foodItemInputSchema).optional(),
     date: z.string().min(1, "اختر تاريخ المصروف"),
     amount: optionalPositiveAmount,
+    loanPersonName: optionalText,
     notes: optionalText,
   })
   .superRefine((value, ctx) => {
@@ -67,20 +79,36 @@ export const expenseSchema = z
       })
     }
 
-    if (value.category !== "food" && typeof value.amount === "undefined") {
-      ctx.addIssue({
-        code: "custom",
-        path: ["amount"],
-        message: value.category === "road_fees" ? "أدخل قيمة الكارتة" : "أدخل قيمة المصروف",
+    if (value.category === "road_fees") {
+      const roadFeeItems = (value.roadFeeItems ?? []).filter((item) => item.roadFeeType || typeof item.amount !== "undefined" || item.customName)
+
+      if (roadFeeItems.length === 0) {
+        ctx.addIssue({ code: "custom", path: ["roadFeeItems"], message: "ضيف كارتة واحدة على الأقل" })
+      }
+
+      value.roadFeeItems?.forEach((item, index) => {
+        if (!item.roadFeeType) {
+          ctx.addIssue({ code: "custom", path: ["roadFeeItems", index, "roadFeeType"], message: "اختار نوع الكارتة" })
+        }
+        if (item.roadFeeType === "custom" && !item.customName) {
+          ctx.addIssue({ code: "custom", path: ["roadFeeItems", index, "customName"], message: "اكتب اسم الكارتة يا عمار" })
+        }
+        if (typeof item.amount === "undefined") {
+          ctx.addIssue({ code: "custom", path: ["roadFeeItems", index, "amount"], message: "أدخل قيمة الكارتة" })
+        }
       })
     }
 
-    if (value.category === "road_fees" && !value.roadFeeType) {
-      ctx.addIssue({ code: "custom", path: ["roadFeeType"], message: "اختار نوع الكارتة" })
+    if (value.category !== "food" && value.category !== "road_fees" && typeof value.amount === "undefined") {
+      ctx.addIssue({
+        code: "custom",
+        path: ["amount"],
+        message: value.category === "trip_loan" ? "أدخل قيمة السلفة" : "أدخل قيمة المصروف",
+      })
     }
 
-    if (value.category === "road_fees" && value.roadFeeType === "custom" && !value.roadFeeCustomName) {
-      ctx.addIssue({ code: "custom", path: ["roadFeeCustomName"], message: "اكتب اسم الكارتة يا عمار" })
+    if (value.category === "trip_loan" && !value.loanPersonName) {
+      ctx.addIssue({ code: "custom", path: ["loanPersonName"], message: "اكتب اسم الشخص" })
     }
 
     if (value.category === "other" && !value.notes) {
@@ -93,17 +121,30 @@ export const expenseSchema = z
           .filter((item) => item.name || typeof item.amount !== "undefined")
           .map((item) => ({ name: item.name ?? "", amount: item.amount ?? 0 }))
       : undefined
+    const roadFeeItems = value.category === "road_fees"
+      ? (value.roadFeeItems ?? [])
+          .filter((item) => item.roadFeeType || typeof item.amount !== "undefined" || item.customName)
+          .map((item) => ({
+            roadFeeType: item.roadFeeType ?? "custom" as const,
+            customName: item.roadFeeType === "custom" ? item.customName : undefined,
+            amount: item.amount ?? 0,
+          }))
+      : undefined
     const foodTotal = foodItems?.reduce((sum, item) => sum + item.amount, 0) ?? 0
+    const roadFeeTotal = roadFeeItems?.reduce((sum, item) => sum + item.amount, 0) ?? 0
+    const firstRoadFeeItem = roadFeeItems?.[0]
 
     return {
       ...value,
-      amount: value.category === "food" ? foodTotal : value.amount ?? 0,
-      roadFeeType: value.category === "road_fees" ? value.roadFeeType : undefined,
-      roadFeeCustomName: value.category === "road_fees" && value.roadFeeType === "custom" ? value.roadFeeCustomName : undefined,
+      amount: value.category === "food" ? foodTotal : value.category === "road_fees" ? roadFeeTotal : value.amount ?? 0,
+      roadFeeType: firstRoadFeeItem?.roadFeeType,
+      roadFeeCustomName: firstRoadFeeItem?.roadFeeType === "custom" ? firstRoadFeeItem.customName : undefined,
+      roadFeeItems,
       foodItems,
     }
   })
 
 export type ExpenseFormInput = z.input<typeof expenseSchema>
 export type ExpenseFormValues = z.output<typeof expenseSchema>
+
 

@@ -2,6 +2,7 @@
 
 export type ExpenseCategory =
   | "fuel"
+  | "fuel_return"
   | "repair"
   | "food"
   | "road_fees"
@@ -9,9 +10,16 @@ export type ExpenseCategory =
   | "loading_unloading"
   | "permits"
   | "other"
+  | "trip_loan"
 
 export interface FoodExpenseItem {
   name: string
+  amount: number
+}
+
+export interface RoadFeeExpenseItem {
+  roadFeeType: RoadFeeType
+  customName?: string
   amount: number
 }
 
@@ -21,6 +29,7 @@ export interface Expense {
   category: ExpenseCategory
   roadFeeType?: RoadFeeType
   roadFeeCustomName?: string
+  roadFeeItems?: RoadFeeExpenseItem[]
   foodItems?: FoodExpenseItem[]
   amount: number
   date: string
@@ -28,3 +37,5 @@ export interface Expense {
   createdAt: string
   updatedAt: string
 }
+
+

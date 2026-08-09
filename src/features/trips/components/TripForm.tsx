@@ -73,13 +73,10 @@ export function TripForm({ trip }: { trip?: Trip }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <FormField label="رقم أو اسم النقلة" error={errors.tripNumber?.message}>
-        <input className="app-field" {...register("tripNumber")} placeholder="مثال: نقلة 1" />
-      </FormField>
       <FormField label="تاريخ النقلة" error={errors.date?.message}>
         <Controller control={control} name="date" render={({ field }) => <DatePicker value={field.value} onChange={field.onChange} />} />
       </FormField>
-      <FormField label="المكان" error={errors.destination?.message}>
+      <FormField label="مكان التعتيق" error={errors.destination?.message}>
         <Controller
           control={control}
           name="destination"
@@ -87,9 +84,6 @@ export function TripForm({ trip }: { trip?: Trip }) {
             <FreightRateSelect value={field.value} rates={freightRates} onChange={field.onChange} placeholder="اختار أو ابحث عن المكان" />
           )}
         />
-      </FormField>
-      <FormField label="خط السير" error={errors.route?.message}>
-        <input className="app-field" {...register("route")} placeholder="مثال: القاهرة - السويس" />
       </FormField>
       <div className="grid gap-3 sm:grid-cols-2">
         <FormField label="عدد الأطنان" error={errors.cargoWeightTons?.message}>
@@ -124,6 +118,7 @@ function FormField({ label, error, children }: { label: string; error?: string; 
     </div>
   )
 }
+
 
 
 

@@ -3,13 +3,14 @@ import { db } from "@/lib/database/db"
 import { toDateInputValue } from "@/lib/utils/formatDate"
 
 export async function createBackup() {
-  const [trips, expenses, freightRates] = await Promise.all([db.trips.toArray(), db.expenses.toArray(), db.freightRates.toArray()])
+  const [trips, expenses, freightRates, tripLoans] = await Promise.all([db.trips.toArray(), db.expenses.toArray(), db.freightRates.toArray(), db.tripLoans.toArray()])
   const backup = {
     version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
     trips,
     expenses,
     freightRates,
+    tripLoans,
   }
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json;charset=utf-8" })
   const url = URL.createObjectURL(blob)
@@ -19,3 +20,4 @@ export async function createBackup() {
   link.click()
   URL.revokeObjectURL(url)
 }
+

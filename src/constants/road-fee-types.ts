@@ -1,4 +1,4 @@
-﻿export type RoadFeeType = "middle" | "regional" | "dahshur" | "desert" | "custom"
+﻿export type RoadFeeType = "middle" | "regional" | "dahshur" | "desert" | "abu_saleh" | "custom"
 
 export interface RoadFeeTypeDefinition {
   key: RoadFeeType
@@ -10,6 +10,7 @@ export const roadFeeTypes: RoadFeeTypeDefinition[] = [
   { key: "regional", label: "كارته الاقليمي" },
   { key: "dahshur", label: "كارته دهشور" },
   { key: "desert", label: "كارته الصحراوي" },
+  { key: "abu_saleh", label: "ابو صالح" },
   { key: "custom", label: "كارته أخرى" },
 ]
 
@@ -22,3 +23,4 @@ export function getRoadFeeLabel(roadFeeType?: RoadFeeType, customName?: string) 
   if (roadFeeType === "custom") return customName?.trim() || roadFeeTypeMap.custom.label
   return roadFeeTypeMap[roadFeeType].label
 }
+

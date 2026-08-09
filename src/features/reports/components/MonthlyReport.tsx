@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { Download, Printer } from "lucide-react"
 
@@ -9,15 +9,18 @@ import type { MonthlyReportData } from "@/features/reports/lib/buildMonthlyRepor
 import { exportReportToCsv } from "@/features/reports/lib/exportReportToCsv"
 import { printMonthlyReport } from "@/features/reports/lib/printMonthlyReport"
 import { formatCurrency } from "@/lib/utils/formatCurrency"
+import { ALL_REPORT_PERIOD } from "@/features/reports/hooks/useMonthlyReport"
 import { formatArabicMonth } from "@/lib/utils/formatDate"
 
 export function MonthlyReport({ report }: { report: MonthlyReportData }) {
+  const isAllReport = report.month === ALL_REPORT_PERIOD
+
   return (
     <div className="space-y-4">
       <div className="app-card flex items-center justify-between gap-3 p-4">
         <div>
-          <p className="text-sm text-muted-foreground">تقرير شهر</p>
-          <h2 className="text-xl font-black">{formatArabicMonth(report.month)}</h2>
+          <p className="text-sm text-muted-foreground">{isAllReport ? "تقرير شامل" : "تقرير شهر"}</p>
+          <h2 className="text-xl font-black">{isAllReport ? "كل النقلات" : formatArabicMonth(report.month)}</h2>
         </div>
         <div className="flex gap-2 no-print">
           <button aria-label="تصدير CSV" onClick={() => exportReportToCsv(report)} className="flex size-11 items-center justify-center rounded-xl border border-border">
@@ -44,3 +47,4 @@ export function MonthlyReport({ report }: { report: MonthlyReportData }) {
     </div>
   )
 }
+

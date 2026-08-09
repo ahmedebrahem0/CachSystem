@@ -5,15 +5,23 @@ import { Pencil, Trash2 } from "lucide-react"
 import { ConfirmDialog } from "@/components/common/ConfirmDialog"
 import { expenseCategoryMap } from "@/constants/expense-categories"
 import { getRoadFeeLabel } from "@/constants/road-fee-types"
-import type { Expense } from "@/features/expenses/types"
+import type { Expense, RoadFeeExpenseItem } from "@/features/expenses/types"
 import { deleteExpense } from "@/lib/database/expense.repository"
 import { formatCurrency } from "@/lib/utils/formatCurrency"
 import { formatArabicDate } from "@/lib/utils/formatDate"
 
+function getRoadFeeItems(expense: Expense): RoadFeeExpenseItem[] {
+  if (expense.roadFeeItems?.length) return expense.roadFeeItems
+  if (expense.category === "road_fees" && expense.roadFeeType) {
+    return [{ roadFeeType: expense.roadFeeType, customName: expense.roadFeeCustomName, amount: expense.amount }]
+  }
+  return []
+}
+
 export function ExpenseCard({ expense, onEdit }: { expense: Expense; onEdit: (expense: Expense) => void }) {
   const category = expenseCategoryMap[expense.category]
   const Icon = category.icon
-  const roadFeeLabel = getRoadFeeLabel(expense.roadFeeType, expense.roadFeeCustomName)
+  const roadFeeItems = getRoadFeeItems(expense)
 
   return (
     <div className="app-card p-4">
@@ -24,7 +32,16 @@ export function ExpenseCard({ expense, onEdit }: { expense: Expense; onEdit: (ex
           </div>
           <div className="min-w-0">
             <h4 className="font-bold">{category.label}</h4>
-            {roadFeeLabel ? <p className="mt-1 text-sm font-bold text-primary">{roadFeeLabel}</p> : null}
+            {roadFeeItems.length ? (
+              <div className="mt-2 space-y-1 rounded-lg bg-muted/70 p-2">
+                {roadFeeItems.map((item, index) => (
+                  <div key={`${item.roadFeeType}-${index}`} className="flex justify-between gap-3 text-sm">
+                    <span className="font-semibold">{getRoadFeeLabel(item.roadFeeType, item.customName)}</span>
+                    <span>{formatCurrency(item.amount)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
             {expense.foodItems?.length ? (
               <div className="mt-2 space-y-1 rounded-lg bg-muted/70 p-2">
                 {expense.foodItems.map((item, index) => (
@@ -58,4 +75,3 @@ export function ExpenseCard({ expense, onEdit }: { expense: Expense; onEdit: (ex
     </div>
   )
 }
-

@@ -10,6 +10,7 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog"
 import { AddExpenseForm } from "@/features/expenses/components/AddExpenseForm"
 import { ExpenseList } from "@/features/expenses/components/ExpenseList"
 import { ExpenseSummary } from "@/features/expenses/components/ExpenseSummary"
+import { TripLoansList } from "@/features/trip-loans/components/TripLoansList"
 import type { Expense } from "@/features/expenses/types"
 import { useTrip } from "@/features/trips/hooks/useTrip"
 import { closeTrip, deleteTrip, reopenTrip } from "@/lib/database/trip.repository"
@@ -17,7 +18,7 @@ import { formatArabicDate } from "@/lib/utils/formatDate"
 
 export function TripDetails({ tripId }: { tripId: string }) {
   const router = useRouter()
-  const { trip, expenses = [], isLoading } = useTrip(tripId)
+  const { trip, expenses = [], loans = [], isLoading } = useTrip(tripId)
   const [formOpen, setFormOpen] = useState(false)
   const [editingExpense, setEditingExpense] = useState<Expense | undefined>()
 
@@ -54,6 +55,7 @@ export function TripDetails({ tripId }: { tripId: string }) {
 
       <ExpenseSummary trip={trip} expenses={expenses} />
 
+
       <div className="grid grid-cols-2 gap-2 no-print">
         {trip.status === "open" ? (
           <button onClick={() => openExpenseForm()} className="col-span-2 flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-4 font-bold text-primary-foreground">
@@ -83,6 +85,16 @@ export function TripDetails({ tripId }: { tripId: string }) {
         </ConfirmDialog>
       </div>
 
+      {loans.length ? (
+        <section className="app-card space-y-3 p-4">
+          <div>
+            <h3 className="text-lg font-black">فلوس علينا</h3>
+            <p className="mt-1 text-sm text-muted-foreground">السلف المسجلة من إضافة مصروف.</p>
+          </div>
+          <TripLoansList loans={loans} />
+        </section>
+      ) : null}
+
       <section>
         <h3 className="mb-3 text-lg font-black">مصروفات النقلة</h3>
         <ExpenseList expenses={expenses} onEdit={openExpenseForm} />
@@ -102,5 +114,7 @@ export function TripDetails({ tripId }: { tripId: string }) {
     </div>
   )
 }
+
+
 
 

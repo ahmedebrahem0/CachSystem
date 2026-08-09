@@ -1,5 +1,6 @@
 ﻿import {
   BadgeDollarSign,
+  HandCoins,
   Beef,
   Fuel,
   LucideIcon,
@@ -20,7 +21,8 @@ export interface ExpenseCategoryDefinition {
 }
 
 export const expenseCategories: ExpenseCategoryDefinition[] = [
-  { key: "fuel", label: "جاز", description: "وقود العربية أثناء الرحلة", icon: Fuel },
+  { key: "fuel", label: "جاز", description: "جاز أثناء الذهاب بالنقلة", icon: Fuel },
+  { key: "fuel_return", label: "جاز رجعه", description: "جاز أثناء الرجوع من النقلة", icon: Fuel },
   { key: "repair", label: "تصليح العربية", description: "صيانة أو أعطال طارئة", icon: Wrench },
   { key: "food", label: "مصاريف أكل", description: "أكل وشرب أثناء النقلة", icon: Beef },
   { key: "road_fees", label: "كارتة ورسوم طريق", description: "كارتة وبوابات ورسوم مرور", icon: Route },
@@ -28,9 +30,12 @@ export const expenseCategories: ExpenseCategoryDefinition[] = [
   { key: "loading_unloading", label: "تحميل وتفريغ", description: "عمالة أو معدات تحميل", icon: PackageCheck },
   { key: "permits", label: "تصاريح", description: "تصاريح أو أوراق مطلوبة", icon: ShieldCheck },
   { key: "other", label: "نوع آخر", description: "أي مصروف آخر مع توضيح", icon: BadgeDollarSign },
+  { key: "trip_loan", label: "فلوس علينا", description: "سلفة من شخص مرتبطة بالنقلة", icon: HandCoins },
 ]
 
 export const expenseCategoryMap = Object.fromEntries(
   expenseCategories.map((category) => [category.key, category])
 ) as Record<ExpenseCategory, ExpenseCategoryDefinition>
+
+
 

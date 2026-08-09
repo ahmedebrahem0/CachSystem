@@ -63,8 +63,9 @@ export async function getTripsByMonth(month: string) {
 }
 
 export async function deleteTrip(id: string) {
-  await db.transaction("rw", db.trips, db.expenses, async () => {
+  await db.transaction("rw", db.trips, db.expenses, db.tripLoans, async () => {
     await db.expenses.where("tripId").equals(id).delete()
+    await db.tripLoans.where("tripId").equals(id).delete()
     await db.trips.delete(id)
   })
 }
@@ -81,3 +82,4 @@ export async function reopenTrip(id: string) {
     updatedAt: new Date().toISOString(),
   })
 }
+

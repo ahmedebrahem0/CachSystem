@@ -24,10 +24,10 @@ function requiredPositiveNumber(requiredMessage: string, invalidMessage: string,
 
 export const tripSchema = z
   .object({
-    tripNumber: z.string().trim().min(1, "اكتب رقم أو اسم النقلة"),
+    tripNumber: optionalText,
     date: z.string().min(1, "اختر تاريخ النقلة"),
     route: optionalText,
-    destination: z.string().trim().min(1, "اختار مكان النقلة"),
+    destination: z.string().trim().min(1, "اختار مكان التعتيق"),
     cargoWeightTons: requiredPositiveNumber("أدخل عدد الأطنان", "أدخل عدد أطنان صحيح", "عدد الأطنان يجب أن يكون أكبر من صفر"),
     pricePerTon: requiredPositiveNumber("أدخل سعر الطن", "أدخل سعر طن صحيح", "سعر الطن يجب أن يكون أكبر من صفر"),
     advanceAmount: requiredPositiveNumber("أدخل قيمة العهدة", "أدخل قيمة عهدة صحيحة", "قيمة العهدة يجب أن تكون أكبر من صفر"),
@@ -35,6 +35,8 @@ export const tripSchema = z
   })
   .transform((value) => ({
     ...value,
+    tripNumber: value.tripNumber ?? value.destination,
+    route: undefined,
     freightAmount: value.cargoWeightTons * value.pricePerTon,
   }))
 

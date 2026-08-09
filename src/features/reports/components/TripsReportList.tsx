@@ -1,8 +1,17 @@
 ﻿import { expenseCategoryMap } from "@/constants/expense-categories"
 import { getRoadFeeLabel } from "@/constants/road-fee-types"
+import type { Expense, RoadFeeExpenseItem } from "@/features/expenses/types"
 import type { MonthlyReportData } from "@/features/reports/lib/buildMonthlyReport"
 import { formatCurrency } from "@/lib/utils/formatCurrency"
 import { formatArabicDate } from "@/lib/utils/formatDate"
+
+function getRoadFeeItems(expense: Expense): RoadFeeExpenseItem[] {
+  if (expense.roadFeeItems?.length) return expense.roadFeeItems
+  if (expense.category === "road_fees" && expense.roadFeeType) {
+    return [{ roadFeeType: expense.roadFeeType, customName: expense.roadFeeCustomName, amount: expense.amount }]
+  }
+  return []
+}
 
 export function TripsReportList({ report }: { report: MonthlyReportData }) {
   return (
@@ -29,14 +38,23 @@ export function TripsReportList({ report }: { report: MonthlyReportData }) {
           </div>
           <div className="mt-3 space-y-2">
             {item.expenses.length ? item.expenses.map((expense) => {
-              const roadFeeLabel = getRoadFeeLabel(expense.roadFeeType, expense.roadFeeCustomName)
+              const roadFeeItems = getRoadFeeItems(expense)
               return (
                 <div key={expense.id} className="rounded-lg bg-muted p-3 text-sm">
                   <div className="flex justify-between gap-2">
                     <span className="font-bold">{expenseCategoryMap[expense.category].label}</span>
                     <span>{formatCurrency(expense.amount)}</span>
                   </div>
-                  {roadFeeLabel ? <p className="mt-1 font-bold text-primary">{roadFeeLabel}</p> : null}
+                  {roadFeeItems.length ? (
+                    <div className="mt-2 space-y-1 rounded-lg bg-card p-2">
+                      {roadFeeItems.map((roadFeeItem, index) => (
+                        <div key={`${roadFeeItem.roadFeeType}-${index}`} className="flex justify-between gap-2">
+                          <span>{getRoadFeeLabel(roadFeeItem.roadFeeType, roadFeeItem.customName)}</span>
+                          <span>{formatCurrency(roadFeeItem.amount)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                   {expense.foodItems?.length ? (
                     <div className="mt-2 space-y-1 rounded-lg bg-card p-2">
                       {expense.foodItems.map((foodItem, index) => (
