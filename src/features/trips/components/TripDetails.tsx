@@ -15,10 +15,11 @@ import type { Expense } from "@/features/expenses/types"
 import { useTrip } from "@/features/trips/hooks/useTrip"
 import { closeTrip, deleteTrip, reopenTrip } from "@/lib/database/trip.repository"
 import { formatArabicDate } from "@/lib/utils/formatDate"
+import { formatCurrency } from "@/lib/utils/formatCurrency"
 
 export function TripDetails({ tripId }: { tripId: string }) {
   const router = useRouter()
-  const { trip, expenses = [], loans = [], isLoading } = useTrip(tripId)
+  const { trip, expenses = [], loans = [], payments = [], isLoading } = useTrip(tripId)
   const [formOpen, setFormOpen] = useState(false)
   const [editingExpense, setEditingExpense] = useState<Expense | undefined>()
 
@@ -44,6 +45,7 @@ export function TripDetails({ tripId }: { tripId: string }) {
             <h2 className="text-2xl font-black">{trip.tripNumber}</h2>
             <p className="text-sm text-muted-foreground">{formatArabicDate(trip.date)}</p>
             {trip.destination ? <p className="mt-2 font-bold text-primary">{trip.destination}</p> : null}
+            {trip.driverFee !== undefined ? <p className="mt-1 text-sm font-bold">حساب السواق: {formatCurrency(trip.driverFee)}</p> : null}
             {trip.route ? <p className="mt-1 font-semibold">{trip.route}</p> : null}
           </div>
           <span className={`rounded-full px-3 py-1 text-xs font-bold ${trip.status === "open" ? "bg-emerald-100 text-emerald-900" : "bg-slate-100 text-slate-700"}`}>
@@ -76,7 +78,7 @@ export function TripDetails({ tripId }: { tripId: string }) {
             <LockOpen className="size-4" /> إعادة فتح
           </button>
         )}
-        <ConfirmDialog title="هل أنت متأكد من حذف هذه النقلة؟" description="سيتم حذف النقلة وجميع المصروفات المرتبطة بها، ولا يمكن التراجع عن هذا الإجراء." confirmLabel="تأكيد حذف النقلة" destructive onConfirm={handleDelete}>
+        <ConfirmDialog title="هل أنت متأكد من حذف هذه النقلة؟" description="سيتم حذف النقلة ومصروفاتها وسلفها، وسيقل إجمالي حساب السواق بقيمة هذه النقلة. لا يمكن التراجع عن الحذف." confirmLabel="تأكيد حذف النقلة" destructive onConfirm={handleDelete}>
           {(open) => (
             <button onClick={open} className="col-span-2 flex items-center justify-center gap-2 rounded-xl border border-red-200 px-4 py-3 font-bold text-destructive">
               <Trash2 className="size-4" /> حذف النقلة
@@ -91,7 +93,7 @@ export function TripDetails({ tripId }: { tripId: string }) {
             <h3 className="text-lg font-black">فلوس علينا</h3>
             <p className="mt-1 text-sm text-muted-foreground">السلف المسجلة من إضافة مصروف.</p>
           </div>
-          <TripLoansList loans={loans} />
+          <TripLoansList loans={loans} payments={payments} />
         </section>
       ) : null}
 
@@ -105,7 +107,7 @@ export function TripDetails({ tripId }: { tripId: string }) {
           <div className="app-card fixed inset-x-0 bottom-0 mx-auto max-h-[88vh] max-w-3xl overflow-auto rounded-b-none p-5">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-black">{editingExpense ? "تعديل مصروف" : "إضافة مصروف"}</h3>
-              <button onClick={() => setFormOpen(false)} className="rounded-lg border border-border px-3 py-2 text-sm">إغلاق</button>
+              <button onClick={() => setFormOpen(false)} className="rounded-lg border border-red-200 px-3 py-2 text-sm font-bold text-destructive hover:bg-red-50">إغلاق</button>
             </div>
             <AddExpenseForm tripId={trip.id} tripDate={trip.date} expense={editingExpense} onSaved={() => setFormOpen(false)} />
           </div>
@@ -114,6 +116,7 @@ export function TripDetails({ tripId }: { tripId: string }) {
     </div>
   )
 }
+
 
 
 
