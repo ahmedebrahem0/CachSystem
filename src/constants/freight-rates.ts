@@ -97,4 +97,5 @@ export const defaultFreightRates: FreightRate[] = [
   { id: "default-094", place: "النوبارية", pricePerTon: 255.85, source: "default", createdAt: "", updatedAt: "" },
   { id: "default-095", place: "بلبيس", pricePerTon: 229.15, source: "default", createdAt: "", updatedAt: "" },
   { id: "default-096", place: "طريق الضيبعه", pricePerTon: 206.06, source: "default", createdAt: "", updatedAt: "" },
+  { id: "default-097", place: "برولس", pricePerTon: 317.90, source: "default", createdAt: "", updatedAt: "" },
 ]
