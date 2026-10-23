@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { Trash2 } from "lucide-react"
+import { ChevronDown, ChevronUp, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -16,6 +16,7 @@ export function FreightRatesManager() {
   const [place, setPlace] = useState("")
   const [pricePerTon, setPricePerTon] = useState("")
   const [isSaving, setIsSaving] = useState(false)
+  const [ratesOpen, setRatesOpen] = useState(false)
 
   async function handleAddRate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -66,7 +67,11 @@ export function FreightRatesManager() {
         </button>
       </form>
 
-      <div className="space-y-2">
+      <button type="button" onClick={() => setRatesOpen((value) => !value)} aria-expanded={ratesOpen} className="flex w-full items-center justify-between rounded-xl bg-muted px-4 py-3 text-sm font-bold">
+        <span>{ratesOpen ? "إخفاء قائمة الأماكن" : "عرض قائمة الأماكن"} ({freightRates.length})</span>
+        {ratesOpen ? <ChevronUp className="size-5 text-primary" aria-hidden /> : <ChevronDown className="size-5 text-primary" aria-hidden />}
+      </button>
+      {ratesOpen ? <div className="max-h-96 space-y-2 overflow-y-auto">
         {freightRates.length ? freightRates.map((rate) => (
           <div key={rate.id} className="flex items-center justify-between gap-3 rounded-xl bg-muted p-3">
             <div className="min-w-0">
@@ -92,7 +97,7 @@ export function FreightRatesManager() {
             </ConfirmDialog> : null}
           </div>
         )) : <p className="rounded-xl bg-muted p-3 text-sm text-muted-foreground">لسه مفيش أسعار أماكن مضافة.</p>}
-      </div>
+      </div> : null}
     </section>
   )
 }
