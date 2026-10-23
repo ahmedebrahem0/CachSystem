@@ -43,7 +43,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         classNames: {
           toast: "cn-toast",
           success: "border-primary bg-primary text-primary-foreground",
-          closeButton: "border-primary/30 bg-primary text-primary-foreground hover:bg-primary/90",
+          closeButton: "border-red-200 bg-red-50 text-destructive hover:bg-red-100",
         },
       }}
       {...props}
@@ -52,4 +52,5 @@ const Toaster = ({ ...props }: ToasterProps) => {
 }
 
 export { Toaster }
+
 
