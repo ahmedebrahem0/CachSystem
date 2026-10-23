@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import * as React from "react"
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
@@ -65,13 +65,12 @@ function DialogContent({
             render={
               <Button
                 variant="ghost"
-                className="absolute top-2 right-2"
+                className="absolute top-2 right-2 border border-red-200 text-destructive hover:bg-red-50 hover:text-destructive"
                 size="icon-sm"
               />
             }
           >
-            <XIcon
-            />
+            <XIcon className="text-destructive" />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
         )}
@@ -109,8 +108,8 @@ function DialogFooter({
     >
       {children}
       {showCloseButton && (
-        <DialogPrimitive.Close render={<Button variant="outline" />}>
-          Close
+        <DialogPrimitive.Close render={<Button variant="outline" className="border-red-200 text-destructive hover:bg-red-50 hover:text-destructive" />}>
+          إغلاق
         </DialogPrimitive.Close>
       )}
     </div>
@@ -158,3 +157,4 @@ export {
   DialogTitle,
   DialogTrigger,
 }
+
