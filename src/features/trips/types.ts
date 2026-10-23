@@ -10,6 +10,7 @@ export interface Trip {
   pricePerTon?: number
   freightAmount?: number
   advanceAmount: number
+  driverFee?: number
   status: TripStatus
   notes?: string
   createdAt: string
