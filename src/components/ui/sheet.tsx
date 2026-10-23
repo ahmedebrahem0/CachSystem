@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import * as React from "react"
 import { Dialog as SheetPrimitive } from "@base-ui/react/dialog"
@@ -65,13 +65,12 @@ function SheetContent({
             render={
               <Button
                 variant="ghost"
-                className="absolute top-3 right-3"
+                className="absolute top-3 right-3 border border-red-200 text-destructive hover:bg-red-50 hover:text-destructive"
                 size="icon-sm"
               />
             }
           >
-            <XIcon
-            />
+            <XIcon className="text-destructive" />
             <span className="sr-only">Close</span>
           </SheetPrimitive.Close>
         )}
@@ -136,3 +135,4 @@ export {
   SheetTitle,
   SheetDescription,
 }
+
