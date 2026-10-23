@@ -4,11 +4,24 @@ import { BackupActions } from "@/features/backup/components/BackupActions"
 import { ImportBackupButton } from "@/features/backup/components/ImportBackupButton"
 import { ResetDataButton } from "@/features/backup/components/ResetDataButton"
 import { FreightRatesManager } from "@/features/freight-rates/components/FreightRatesManager"
+import { DriverRatesManager } from "@/features/driver-rates/components/DriverRatesManager"
+import Link from "next/link"
+import { routes } from "@/constants/routes"
 
 export default function SettingsPage() {
   return (
     <div className="space-y-4">
       <PageHeader title="الإعدادات" description="إدارة أسعار الأماكن والنسخ الاحتياطية وبيانات الجهاز" />
+      <section className="app-card space-y-3 p-4">
+        <h2 className="text-lg font-black">حسابات الشغل</h2>
+        <Link href={routes.driverAccount} style={{ color: "var(--primary-foreground)" }} className="flex w-full items-center justify-between rounded-xl bg-primary px-5 py-4 font-bold">
+          <span>حساب السواق</span><span aria-hidden>←</span>
+        </Link>
+        <Link href={routes.assistantWages} style={{ color: "var(--primary-foreground)" }} className="flex w-full items-center justify-between rounded-xl bg-primary px-5 py-4 font-bold">
+          <span>حساب التباع</span><span aria-hidden>←</span>
+        </Link>
+      </section>
+      <DriverRatesManager />
       <FreightRatesManager />
       <section className="app-card space-y-3 p-4">
         <h2 className="text-lg font-black">النسخ الاحتياطي والاستعادة</h2>

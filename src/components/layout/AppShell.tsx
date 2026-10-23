@@ -13,6 +13,8 @@ const titles: Record<string, string> = {
   "/trips/new": "إضافة نقلة",
   "/reports": "التقارير",
   "/settings": "الإعدادات",
+  "/settings/assistant-wages": "حساب التباع",
+  "/settings/driver-account": "حساب السواق",
 }
 
 function getTitle(pathname: string) {
