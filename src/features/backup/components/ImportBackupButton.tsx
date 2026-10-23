@@ -9,6 +9,7 @@ import type { BackupData } from "@/features/backup/schema/backup.schema"
 import { importBackup } from "@/features/backup/lib/importBackup"
 import { validateBackup } from "@/features/backup/lib/validateBackup"
 import { getErrorMessage } from "@/lib/utils/getErrorMessage"
+import { deriveDriverRates } from "@/features/driver-rates/lib/deriveDriverRates"
 
 export function ImportBackupButton() {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -36,7 +37,7 @@ export function ImportBackupButton() {
       <input ref={inputRef} type="file" accept="application/json" className="hidden" onChange={(event) => handleFile(event.target.files?.[0])} />
       <ConfirmDialog
         title="استيراد نسخة احتياطية"
-        description={backup ? `سيتم استبدال البيانات الحالية بـ ${backup.trips.length} نقلة و ${backup.expenses.length} مصروف. هل تريد المتابعة؟` : "اختر ملف النسخة الاحتياطية أولًا."}
+        description={backup ? `سيتم استبدال البيانات الحالية بـ ${backup.trips.length} نقلة و ${backup.expenses.length} مصروف و ${backup.companyPayments?.length ?? 0} دفعة شركة و ${backup.assistantWages?.length ?? 0} حساب تباع و ${backup.driverEntries?.length ?? 0} حركة حساب سواق و ${backup.driverRates?.length ?? deriveDriverRates(backup.trips).length} سعر سواق محفوظ. هل تريد المتابعة؟` : "اختر ملف النسخة الاحتياطية أولًا."}
         confirmLabel="استيراد"
         onConfirm={async () => {
           if (!backup) return

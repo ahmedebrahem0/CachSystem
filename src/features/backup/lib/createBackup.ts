@@ -3,7 +3,9 @@ import { db } from "@/lib/database/db"
 import { toDateInputValue } from "@/lib/utils/formatDate"
 
 export async function createBackup() {
-  const [trips, expenses, freightRates, tripLoans] = await Promise.all([db.trips.toArray(), db.expenses.toArray(), db.freightRates.toArray(), db.tripLoans.toArray()])
+  const [trips, expenses, freightRates, tripLoans, loanPayments, companyPayments, assistantWages, driverEntries, driverRates] = await db.transaction("r", [db.trips, db.expenses, db.freightRates, db.tripLoans, db.loanPayments, db.companyPayments, db.assistantWages, db.driverEntries, db.driverRates], () =>
+    Promise.all([db.trips.toArray(), db.expenses.toArray(), db.freightRates.toArray(), db.tripLoans.toArray(), db.loanPayments.toArray(), db.companyPayments.toArray(), db.assistantWages.toArray(), db.driverEntries.toArray(), db.driverRates.toArray()])
+  )
   const backup = {
     version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
@@ -11,6 +13,11 @@ export async function createBackup() {
     expenses,
     freightRates,
     tripLoans,
+    loanPayments,
+    companyPayments,
+    assistantWages,
+    driverEntries,
+    driverRates,
   }
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json;charset=utf-8" })
   const url = URL.createObjectURL(blob)
