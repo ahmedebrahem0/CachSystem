@@ -31,6 +31,7 @@ export const tripSchema = z
     cargoWeightTons: requiredPositiveNumber("أدخل عدد الأطنان", "أدخل عدد أطنان صحيح", "عدد الأطنان يجب أن يكون أكبر من صفر"),
     pricePerTon: requiredPositiveNumber("أدخل سعر الطن", "أدخل سعر طن صحيح", "سعر الطن يجب أن يكون أكبر من صفر"),
     advanceAmount: requiredPositiveNumber("أدخل قيمة العهدة", "أدخل قيمة عهدة صحيحة", "قيمة العهدة يجب أن تكون أكبر من صفر"),
+    driverFee: z.preprocess(normalizeNumberInput, z.number().finite("أدخل قيمة صحيحة").nonnegative("حساب السواق لا يمكن أن يكون سالبًا").refine((amount) => Math.abs(Math.round(amount * 100) - amount * 100) < 0.000001, "أدخل مبلغًا بحد أقصى رقمين بعد العلامة العشرية").optional()),
     notes: optionalText,
   })
   .transform((value) => ({

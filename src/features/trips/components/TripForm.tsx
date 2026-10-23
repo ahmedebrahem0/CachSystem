@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { Controller, useForm, useWatch } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -10,6 +10,7 @@ import { CurrencyInput } from "@/components/common/CurrencyInput"
 import { DatePicker } from "@/components/common/DatePicker"
 import { FreightRateSelect } from "@/features/freight-rates/components/FreightRateSelect"
 import { useFreightRates } from "@/features/freight-rates/hooks/useFreightRates"
+import { useDriverRates } from "@/features/driver-rates/hooks/useDriverRates"
 import { tripSchema, type TripFormInput, type TripFormValues } from "@/features/trips/schema/trip.schema"
 import type { Trip } from "@/features/trips/types"
 import { createTrip, updateTrip } from "@/lib/database/trip.repository"
@@ -21,6 +22,8 @@ export function TripForm({ trip }: { trip?: Trip }) {
   const router = useRouter()
   const storedFreightRates = useFreightRates()
   const freightRates = useMemo(() => storedFreightRates ?? [], [storedFreightRates])
+  const driverRates = useDriverRates()
+  const previousDestination = useRef(trip?.destination ?? trip?.route ?? "")
   const {
     register,
     control,
@@ -37,6 +40,7 @@ export function TripForm({ trip }: { trip?: Trip }) {
       cargoWeightTons: trip?.cargoWeightTons ?? undefined,
       pricePerTon: trip?.pricePerTon ?? undefined,
       advanceAmount: trip?.advanceAmount ?? undefined,
+      driverFee: trip?.driverFee ?? undefined,
       notes: trip?.notes ?? "",
     },
   })
@@ -48,6 +52,13 @@ export function TripForm({ trip }: { trip?: Trip }) {
     const selectedRate = freightRates.find((rate) => rate.place === destination)
     if (selectedRate) setValue("pricePerTon", selectedRate.pricePerTon, { shouldValidate: true })
   }, [destination, freightRates, setValue])
+
+  useEffect(() => {
+    if (!driverRates || !destination || destination === previousDestination.current) return
+    previousDestination.current = destination
+    const selectedRate = driverRates.find((rate) => rate.place === destination)
+    setValue("driverFee", selectedRate?.amount, { shouldValidate: true, shouldDirty: true })
+  }, [destination, driverRates, setValue])
 
   const freightAmount = useMemo(() => {
     const tons = Number(cargoWeightTons)
@@ -100,6 +111,10 @@ export function TripForm({ trip }: { trip?: Trip }) {
       <FormField label="قيمة العهدة" error={errors.advanceAmount?.message}>
         <CurrencyInput {...register("advanceAmount")} placeholder="0" />
       </FormField>
+      <FormField label="حساب السواق لهذه النقلة" error={errors.driverFee?.message}>
+        <CurrencyInput {...register("driverFee")} placeholder="اكتب المبلغ المتفق عليه" />
+      </FormField>
+      <p className="-mt-2 text-xs text-muted-foreground">السعر المحفوظ للمكان يظهر تلقائيًا، وتقدر تغيّره لهذه النقلة قبل الحفظ.</p>
       <div className="sticky bottom-24 z-20 rounded-xl bg-background/90 py-2 backdrop-blur no-print">
         <button disabled={isSubmitting} className="w-full rounded-xl bg-primary px-5 py-4 font-bold text-primary-foreground">
           {isSubmitting ? "جاري الحفظ..." : trip ? "حفظ التعديلات" : "حفظ النقلة"}
