@@ -12,7 +12,7 @@ import { getCurrentMonth } from "@/lib/utils/formatDate"
 
 export function DashboardPageContent() {
   const [month, setMonth] = useState(getCurrentMonth())
-  const { trips = [], expenses = [], summary, isLoading } = useDashboard(month)
+  const { trips = [], expenses = [], companyPayments = [], summary, isLoading } = useDashboard(month)
 
   return (
     <div className="space-y-4">
@@ -22,7 +22,7 @@ export function DashboardPageContent() {
         <p className="text-center text-sm text-muted-foreground">جاري تحميل الملخص...</p>
       ) : (
         <>
-          <MonthlySummary summary={summary} />
+          <MonthlySummary summary={summary} month={month} companyPayments={companyPayments} />
           <RecentTrips trips={trips} expenses={expenses} />
           <ExpenseCategorySummary summary={summary} />
         </>
