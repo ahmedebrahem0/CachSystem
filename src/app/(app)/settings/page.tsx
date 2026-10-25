@@ -1,8 +1,11 @@
 ﻿import { PageHeader } from "@/components/common/PageHeader"
 import { siteConfig } from "@/config/site"
 import { BackupActions } from "@/features/backup/components/BackupActions"
+import { CloudReadinessPanel } from "@/features/backup/components/CloudReadinessPanel"
 import { ImportBackupButton } from "@/features/backup/components/ImportBackupButton"
 import { ResetDataButton } from "@/features/backup/components/ResetDataButton"
+import { VerifyBackupButton } from "@/features/backup/components/VerifyBackupButton"
+import { LocalStorageStatus } from "@/features/backup/components/LocalStorageStatus"
 import { FreightRatesManager } from "@/features/freight-rates/components/FreightRatesManager"
 import { DriverRatesManager } from "@/features/driver-rates/components/DriverRatesManager"
 import Link from "next/link"
@@ -26,8 +29,11 @@ export default function SettingsPage() {
       <section className="app-card space-y-3 p-4">
         <h2 className="text-lg font-black">النسخ الاحتياطي والاستعادة</h2>
         <BackupActions />
+        <VerifyBackupButton />
         <ImportBackupButton />
       </section>
+      <LocalStorageStatus />
+      <CloudReadinessPanel />
       <section className="app-card space-y-3 p-4">
         <h2 className="text-lg font-black text-destructive">إدارة البيانات</h2>
         <ResetDataButton />
