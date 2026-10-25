@@ -8,7 +8,7 @@ import { resetApplicationData } from "@/features/backup/lib/importBackup"
 
 export function ResetDataButton() {
   return (
-    <ConfirmDialog title="حذف جميع البيانات" description="سيتم حذف كل النقلات والمصروفات من هذا الجهاز نهائيًا." confirmLabel="تأكيد حذف البيانات" destructive onConfirm={async () => {
+    <ConfirmDialog title="حذف جميع البيانات" description="سيتم حذف كل النقلات والمصروفات والسلف والدفعات وحسابات السواق والتباع والأسعار من هذا الجهاز. تأكد من تنزيل وفحص نسخة احتياطية أولًا." confirmLabel="تأكيد حذف البيانات" destructive onConfirm={async () => {
       await resetApplicationData()
       toast.success("تم حذف جميع البيانات")
     }}>
