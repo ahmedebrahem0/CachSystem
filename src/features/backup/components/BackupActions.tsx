@@ -10,7 +10,7 @@ export function BackupActions() {
   async function handleExport() {
     try {
       await createBackup()
-      toast.success("تم تجهيز النسخة الاحتياطية")
+      toast.success("بدأ تنزيل النسخة الاحتياطية. تأكد من وجود الملف ثم افحصه من هنا.")
     } catch (error) {
       toast.error(getErrorMessage(error))
     }
