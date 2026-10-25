@@ -1,6 +1,7 @@
 ﻿import { BACKUP_VERSION } from "@/constants/storage"
 import { db } from "@/lib/database/db"
 import { toDateInputValue } from "@/lib/utils/formatDate"
+import { validateBackup } from "./validateBackup"
 
 export async function createBackup() {
   const [trips, expenses, freightRates, tripLoans, loanPayments, companyPayments, assistantWages, driverEntries, driverRates] = await db.transaction("r", [db.trips, db.expenses, db.freightRates, db.tripLoans, db.loanPayments, db.companyPayments, db.assistantWages, db.driverEntries, db.driverRates], () =>
@@ -18,6 +19,9 @@ export async function createBackup() {
     assistantWages,
     driverEntries,
     driverRates,
+  }
+  if (!validateBackup(backup).success) {
+    throw new Error("تعذر التحقق من اكتمال النسخة الاحتياطية. لم يتم تنزيل ملف غير مكتمل.")
   }
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json;charset=utf-8" })
   const url = URL.createObjectURL(blob)

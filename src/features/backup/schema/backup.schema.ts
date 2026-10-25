@@ -44,7 +44,7 @@ const roadFeeItemSchema = z.object({
 const expenseSchema = z.object({
   id: z.string().min(1),
   tripId: z.string().min(1),
-  category: z.enum(["fuel", "fuel_return", "repair", "food", "road_fees", "scale", "loading_unloading", "permits", "other"]),
+  category: z.enum(["fuel", "fuel_return", "repair", "food", "road_fees", "scale", "loading_unloading", "permits", "other", "trip_loan"]),
   roadFeeType: z.enum(["middle", "regional", "dahshur", "desert", "abu_saleh", "custom"]).optional(),
   roadFeeCustomName: z.string().optional(),
   roadFeeItems: z.array(roadFeeItemSchema).optional(),
@@ -125,6 +125,14 @@ export const backupSchema = z
     driverRates: z.array(driverRateSchema).optional(),
   })
   .superRefine((backup, ctx) => {
+    if (backup.version === BACKUP_VERSION) {
+      const requiredCollections = ["freightRates", "tripLoans", "loanPayments", "companyPayments", "assistantWages", "driverEntries", "driverRates"] as const
+      for (const collection of requiredCollections) {
+        if (backup[collection] === undefined) {
+          ctx.addIssue({ code: "custom", path: [collection], message: `قسم ${collection} مفقود من النسخة الاحتياطية` })
+        }
+      }
+    }
     const tripIds = new Set(backup.trips.map((trip) => trip.id))
     backup.trips.forEach((trip, index) => {
       if (trip.driverFee !== undefined && Math.abs(Math.round(trip.driverFee * 100) - trip.driverFee * 100) > 0.000001) {
