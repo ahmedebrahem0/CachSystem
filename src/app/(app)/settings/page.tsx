@@ -24,6 +24,13 @@ export default function SettingsPage() {
       <DriverRatesManager />
       <FreightRatesManager />
       <section className="app-card space-y-3 p-4">
+        <h2 className="text-lg font-black">مراجعة العربية</h2>
+        <Link href={routes.fuelReport} className="flex w-full items-center justify-between rounded-xl bg-primary px-5 py-4 font-bold text-primary-foreground">
+          <span className="text-white">تقرير جاز العربية</span><span aria-hidden>←</span>
+        </Link>
+        <p className="text-sm text-muted-foreground">راجع الجاز المسجل لكل نقلة وقارن النقلات المتكررة لنفس المكان.</p>
+      </section>
+      <section className="app-card space-y-3 p-4">
         <h2 className="text-lg font-black">النسخ الاحتياطي والاستعادة</h2>
         <BackupActions />
         <ImportBackupButton />

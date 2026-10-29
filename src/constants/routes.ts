@@ -6,4 +6,5 @@ export const routes = {
   settings: "/settings",
   assistantWages: "/settings/assistant-wages",
   driverAccount: "/settings/driver-account",
+  fuelReport: "/settings/fuel-report",
 } as const
